@@ -69,41 +69,49 @@ export function CheckoutForm({ cartItems, userProfile, userId }: CheckoutFormPro
     const supabase = createClient()
 
     try {
+      console.log("[v0] Starting order creation process")
+
       // Generate order number
       const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`
+      console.log("[v0] Generated order number:", orderNumber)
+
+      const orderData = {
+        user_id: userId,
+        order_number: orderNumber,
+        status: "pending",
+        total_amount: total,
+        shipping_address: {
+          fullName: formData.fullName,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          phone: formData.phone,
+        },
+        billing_address: {
+          fullName: formData.fullName,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          phone: formData.phone,
+        },
+        payment_method: formData.paymentMethod,
+        payment_status: formData.paymentMethod === "cod" ? "pending" : "completed",
+        notes: formData.notes || null,
+      }
+
+      console.log("[v0] Order data prepared:", orderData)
 
       // Create order
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          user_id: userId,
-          order_number: orderNumber,
-          status: "pending",
-          total_amount: total,
-          shipping_address: {
-            fullName: formData.fullName,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            pincode: formData.pincode,
-            phone: formData.phone,
-          },
-          billing_address: {
-            fullName: formData.fullName,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            pincode: formData.pincode,
-            phone: formData.phone,
-          },
-          payment_method: formData.paymentMethod,
-          payment_status: formData.paymentMethod === "cod" ? "pending" : "completed",
-          notes: formData.notes,
-        })
-        .select()
-        .single()
+      const { data: order, error: orderError } = await supabase.from("orders").insert(orderData).select().single()
 
-      if (orderError) throw orderError
+      if (orderError) {
+        console.error("[v0] Order creation error:", orderError)
+        throw orderError
+      }
+
+      console.log("[v0] Order created successfully:", order)
 
       // Create order items
       const orderItems = cartItems.map((item) => ({
@@ -117,20 +125,32 @@ export function CheckoutForm({ cartItems, userProfile, userId }: CheckoutFormPro
         price: item.products.price,
       }))
 
+      console.log("[v0] Creating order items:", orderItems)
+
       const { error: itemsError } = await supabase.from("order_items").insert(orderItems)
 
-      if (itemsError) throw itemsError
+      if (itemsError) {
+        console.error("[v0] Order items creation error:", itemsError)
+        throw itemsError
+      }
+
+      console.log("[v0] Order items created successfully")
 
       // Clear cart
       const { error: clearError } = await supabase.from("cart_items").delete().eq("user_id", userId)
 
-      if (clearError) throw clearError
+      if (clearError) {
+        console.error("[v0] Cart clear error:", clearError)
+        throw clearError
+      }
+
+      console.log("[v0] Cart cleared successfully")
 
       // Redirect to success page
       router.push(`/order-success?orderNumber=${orderNumber}`)
     } catch (error) {
       console.error("[v0] Error processing order:", error)
-      alert("Failed to process order. Please try again.")
+      alert(`Failed to process order: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsProcessing(false)
     }

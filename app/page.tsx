@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Star } from "lucide-react"
-import { AdminInstructions } from "@/components/admin-instructions"
 
 export default async function Home() {
   const supabase = await createClient()
@@ -55,13 +54,6 @@ export default async function Home() {
               />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Admin Instructions Section */}
-      <section className="py-8 bg-background border-b border-border">
-        <div className="container px-4">
-          <AdminInstructions />
         </div>
       </section>
 

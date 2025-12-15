@@ -3,16 +3,28 @@
 import type React from "react"
 
 import Link from "next/link"
-import { ShoppingBag, Heart, User, Search, Menu, X } from "lucide-react"
+import { ShoppingBag, Heart, User, Search, Menu, X, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [categories, setCategories] = useState<any[]>([])
   const router = useRouter()
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const supabase = createClient()
+      const { data } = await supabase.from("categories").select("*").order("name")
+      if (data) setCategories(data)
+    }
+    fetchCategories()
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,27 +39,38 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-serif text-2xl font-bold text-primary">Sunehriluxurystyle</span>
+          <span className="font-serif text-2xl font-bold text-primary">Sunehri Luxury Style</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
+          <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+            Home
+          </Link>
+          <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
+            About
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors">
+              Categories
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link href="/categories" className="w-full cursor-pointer">
+                  All Categories
+                </Link>
+              </DropdownMenuItem>
+              {categories.map((category) => (
+                <DropdownMenuItem key={category.id} asChild>
+                  <Link href={`/shop/${category.slug}`} className="w-full cursor-pointer">
+                    {category.name}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link href="/shop/all" className="text-sm font-medium hover:text-primary transition-colors">
             Shop All
-          </Link>
-          <Link href="/shop/sarees" className="text-sm font-medium hover:text-primary transition-colors">
-            Sarees
-          </Link>
-          <Link href="/shop/kurtis" className="text-sm font-medium hover:text-primary transition-colors">
-            Kurtis
-          </Link>
-          <Link href="/shop/gowns" className="text-sm font-medium hover:text-primary transition-colors">
-            Gowns
-          </Link>
-          <Link href="/shop/party-wear" className="text-sm font-medium hover:text-primary transition-colors">
-            Party Wear
-          </Link>
-          <Link href="/shop/casual-wear" className="text-sm font-medium hover:text-primary transition-colors">
-            Casual
           </Link>
         </nav>
 
@@ -74,7 +97,6 @@ export function Header() {
               <span className="sr-only">Shopping cart</span>
             </Button>
           </Link>
-          {/* Added mobile menu button */}
           <Button
             variant="ghost"
             size="icon"
@@ -91,46 +113,42 @@ export function Header() {
         <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur">
           <nav className="container px-4 py-4 flex flex-col gap-3">
             <Link
+              href="/"
+              className="text-sm font-medium hover:text-primary transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              href="/about"
+              className="text-sm font-medium hover:text-primary transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link
+              href="/categories"
+              className="text-sm font-medium hover:text-primary transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              All Categories
+            </Link>
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/shop/${category.slug}`}
+                className="text-sm font-medium hover:text-primary transition-colors py-2 pl-4"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {category.name}
+              </Link>
+            ))}
+            <Link
               href="/shop/all"
               className="text-sm font-medium hover:text-primary transition-colors py-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Shop All
-            </Link>
-            <Link
-              href="/shop/sarees"
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Sarees
-            </Link>
-            <Link
-              href="/shop/kurtis"
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Kurtis
-            </Link>
-            <Link
-              href="/shop/gowns"
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Gowns
-            </Link>
-            <Link
-              href="/shop/party-wear"
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Party Wear
-            </Link>
-            <Link
-              href="/shop/casual-wear"
-              className="text-sm font-medium hover:text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Casual
             </Link>
           </nav>
         </div>

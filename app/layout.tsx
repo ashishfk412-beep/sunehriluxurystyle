@@ -11,7 +11,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 const _playfairDisplay = Playfair_Display({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Elegant Threads - Women's Dress Collection",
+  title: "Sunehri Luxury Style - Women's Dress Collection",
   description: "Discover timeless elegance with our curated collection of sarees, kurtis, gowns, and party wear",
   generator: "v0.app",
   icons: {
