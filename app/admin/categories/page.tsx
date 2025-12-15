@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import Image from "next/image"
+import { ArrowLeft, Plus } from "lucide-react"
+import { CategoriesTable } from "@/components/admin/categories-table"
 
 export default async function AdminCategoriesPage() {
   const supabase = await createClient()
@@ -31,41 +31,25 @@ export default async function AdminCategoriesPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="font-serif text-3xl md:text-4xl font-bold mb-2">Manage Categories</h1>
-              <p className="text-muted-foreground">View and manage product categories</p>
+              <p className="text-muted-foreground">Organize your products into categories</p>
             </div>
-            <Link href="/admin">
-              <Button variant="outline">Back to Dashboard</Button>
-            </Link>
+            <div className="flex gap-3">
+              <Link href="/admin">
+                <Button variant="outline">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link href="/admin/categories/new">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Category
+                </Button>
+              </Link>
+            </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories && categories.length > 0 ? (
-              categories.map((category) => (
-                <Card key={category.id}>
-                  <CardContent className="p-4">
-                    {category.image_url && (
-                      <div className="aspect-video relative mb-3 rounded-lg overflow-hidden bg-muted">
-                        <Image
-                          src={category.image_url || "/placeholder.svg"}
-                          alt={category.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <h3 className="font-semibold mb-1">{category.name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{category.description}</p>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card className="col-span-full">
-                <CardContent className="p-12 text-center">
-                  <p className="text-muted-foreground">No categories yet</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          <CategoriesTable categories={categories || []} />
         </div>
       </div>
     </div>

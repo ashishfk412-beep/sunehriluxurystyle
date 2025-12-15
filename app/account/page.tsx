@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { User, ShoppingBag, Heart, LogOut } from "lucide-react"
+import { User, ShoppingBag, Heart, LogOut, ShieldCheck } from "lucide-react"
 
 export default async function AccountPage() {
   const supabase = await createClient()
@@ -99,12 +99,20 @@ export default async function AccountPage() {
                   Edit Profile
                 </Button>
               </Link>
-              <form action="/auth/logout" method="post">
-                <Button type="submit" variant="outline" className="w-full justify-start bg-transparent" size="lg">
+              {profile?.is_admin && (
+                <Link href="/admin">
+                  <Button variant="outline" className="w-full justify-start bg-transparent border-primary/50" size="lg">
+                    <ShieldCheck className="mr-3 h-5 w-5 text-primary" />
+                    <span className="text-primary font-semibold">Admin Panel</span>
+                  </Button>
+                </Link>
+              )}
+              <Link href="/auth/logout">
+                <Button variant="outline" className="w-full justify-start bg-transparent" size="lg">
                   <LogOut className="mr-3 h-5 w-5" />
                   Sign Out
                 </Button>
-              </form>
+              </Link>
             </CardContent>
           </Card>
         </div>
