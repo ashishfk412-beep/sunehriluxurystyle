@@ -3,7 +3,18 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Package, ShoppingBag, Users, TrendingUp, Grid3x3, LayoutDashboard } from "lucide-react"
+import {
+  Package,
+  ShoppingBag,
+  Users,
+  TrendingUp,
+  Grid3x3,
+  LayoutDashboard,
+  Percent,
+  Warehouse,
+  Receipt,
+  LogOut,
+} from "lucide-react"
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -28,6 +39,8 @@ export default async function AdminDashboard() {
   const { count: categoryCount } = await supabase.from("categories").select("*", { count: "exact", head: true })
   const { count: orderCount } = await supabase.from("orders").select("*", { count: "exact", head: true })
   const { count: userCount } = await supabase.from("profiles").select("*", { count: "exact", head: true })
+  const { count: warehouseCount } = await supabase.from("warehouses").select("*", { count: "exact", head: true })
+  const { count: discountCount } = await supabase.from("discounts").select("*", { count: "exact", head: true })
   const { data: orders } = await supabase.from("orders").select("total_amount")
 
   const { data: recentOrders } = await supabase
@@ -42,9 +55,17 @@ export default async function AdminDashboard() {
     <div className="min-h-screen bg-background">
       <div className="container px-4 py-8 md:py-12">
         <div className="space-y-8">
-          <div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back! Manage your store from here.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="font-serif text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
+              <p className="text-muted-foreground">Welcome back! Manage your store from here.</p>
+            </div>
+            <Link href="/auth/logout">
+              <Button variant="outline" className="gap-2 bg-transparent">
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </Link>
           </div>
 
           {/* Stats Grid */}
@@ -104,6 +125,34 @@ export default async function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Warehouse className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Warehouses</p>
+                    <p className="text-2xl font-bold">{warehouseCount || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Percent className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Active Discounts</p>
+                    <p className="text-2xl font-bold">{discountCount || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
@@ -153,6 +202,24 @@ export default async function AdminDashboard() {
                 <Button variant="outline" className="w-full h-20 text-lg bg-transparent hover:bg-primary/5" size="lg">
                   <Users className="mr-2 h-5 w-5" />
                   Users
+                </Button>
+              </Link>
+              <Link href="/admin/discounts">
+                <Button variant="outline" className="w-full h-20 text-lg bg-transparent hover:bg-primary/5" size="lg">
+                  <Percent className="mr-2 h-5 w-5" />
+                  Discounts
+                </Button>
+              </Link>
+              <Link href="/admin/taxes">
+                <Button variant="outline" className="w-full h-20 text-lg bg-transparent hover:bg-primary/5" size="lg">
+                  <Receipt className="mr-2 h-5 w-5" />
+                  Tax Rates
+                </Button>
+              </Link>
+              <Link href="/admin/warehouses">
+                <Button variant="outline" className="w-full h-20 text-lg bg-transparent hover:bg-primary/5" size="lg">
+                  <Warehouse className="mr-2 h-5 w-5" />
+                  Warehouses
                 </Button>
               </Link>
             </CardContent>

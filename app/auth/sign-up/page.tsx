@@ -76,7 +76,7 @@ export default function SignUpPage() {
           <Card className="border-border/50">
             <CardHeader>
               <CardTitle className="text-2xl font-serif">Create Account</CardTitle>
-              <CardDescription>Start your journey with Elegant Threads</CardDescription>
+              <CardDescription>Start your journey with Sunehriluxurystyle</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignUp}>

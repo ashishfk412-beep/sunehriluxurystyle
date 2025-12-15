@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { Printer } from "lucide-react"
 
 export default async function OrdersPage() {
   const supabase = await createClient()
@@ -83,7 +85,17 @@ export default async function OrdersPage() {
                       <p className="text-sm text-muted-foreground mb-1">Total</p>
                       <p className="font-semibold">₹{order.total_amount.toLocaleString()}</p>
                     </div>
-                    <Badge className={getStatusColor(order.status)}>{order.status.toUpperCase()}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getStatusColor(order.status)}>{order.status.toUpperCase()}</Badge>
+                      {order.status === "delivered" && (
+                        <Link href={`/account/orders/${order.id}/print`} target="_blank">
+                          <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+                            <Printer className="h-4 w-4" />
+                            Print
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-3">
